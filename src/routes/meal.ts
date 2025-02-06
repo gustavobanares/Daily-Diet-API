@@ -68,9 +68,15 @@ export async function mealRoutes(app: FastifyInstance) {
       .count({count: '*'})
       .first()
 
+      const totalMealsOffDiet = await knex('meals')
+      .where({session_id: sessionId, is_on_diet: false})
+      .count({count: '*'})
+      .first()
+
       return reply.status(200).send({
         totalMeals,
         totalMealsOnDiet,
+        totalMealsOffDiet
       });
     }
   );

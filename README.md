@@ -15,7 +15,7 @@
 [x] Deve ser possível recuperar as métricas de um usuário:
 [x] Quantidade total de refeições registradas;
 [x] Quantidade total de refeições dentro da dieta;
-[] Quantidade total de refeições fora da dieta;
+[x] Quantidade total de refeições fora da dieta;
 [] Melhor sequência de refeições dentro da dieta;
 
 
