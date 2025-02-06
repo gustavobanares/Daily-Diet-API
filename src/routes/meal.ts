@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { randomInt, randomUUID } from "node:crypto";
-import { z } from "zod";
+import { object, z } from "zod";
 import { knex } from "../database";
 import { checkSessionIdExists } from "../middlewares/check-session-id-exists";
 
@@ -88,4 +88,48 @@ export async function mealRoutes(app: FastifyInstance) {
 
     return reply.status(201).send();
   });
+
+  app.put(
+    "/:id",
+    {
+      preHandler: checkSessionIdExists,
+    },
+    async (request, reply) => {
+      const getMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const { id } = getMealParamsSchema.parse(request.params);
+
+      const { sessionId } = request.cookies;
+
+      const updateMealBodySchema = z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        date_time: z
+          .preprocess((arg) => {
+            if (typeof arg === "string" || arg instanceof Date) {
+              return new Date(arg); // Aqui a conversão para Date
+            }
+            return arg;
+          }, z.date())
+          .optional(), // Tornamos a data opcional
+        is_on_diet: z.boolean().optional(),
+      });
+
+      const { name, description, date_time, is_on_diet } =
+        updateMealBodySchema.parse(request.body);
+
+      await knex("meals").where({ id, session_id: sessionId }).update({
+        name,
+        description,
+        date_time: date_time?.toISOString(),
+        is_on_diet,
+      });
+
+      return reply
+        .status(200)
+        .send({ message: "Refeição atualizada com sucesso!" });
+    }
+  );
 }

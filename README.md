@@ -8,7 +8,7 @@
 [x] Data e Hora;
 [x] Está dentro ou não da dieta;
 
-[] Deve ser possível editar uma refeição, podendo alterar todos os dados acima;
+[x] Deve ser possível editar uma refeição, podendo alterar todos os dados acima;
 [] Deve ser possível apagar uma refeição;
 [x] Deve ser possível listar todas as refeições de um usuário;
 [x] Deve ser possível visualizar uma única refeição;
@@ -20,12 +20,12 @@
 
 
 # Requisitos Não Funcionais (RNF)
-[] O sistema deve utilizar autenticação para identificar o usuário entre as requisições;
+[x] O sistema deve utilizar autenticação para identificar o usuário entre as requisições;
 [] O tempo de resposta da API deve ser inferior a 1 segundo para as principais operações;
 [x] O sistema deve ser desenvolvido utilizando Node.js e TypeScript;
 
 
 # Regras de Negócio (RN)
 [x] As refeições devem estar relacionadas a um usuário;
-[] O usuário só pode visualizar, editar e apagar as refeições que ele criou;
+[x] O usuário só pode visualizar, editar e apagar as refeições que ele criou;
 [x] Uma refeição deve ser classificada como "dentro da dieta" ou "fora da dieta";
