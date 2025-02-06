@@ -4,7 +4,6 @@ import { z } from "zod";
 import { knex } from "../database";
 import { checkSessionIdExists } from "../middlewares/check-session-id-exists";
 
-
 export async function mealRoutes(app: FastifyInstance) {
   app.get(
     "/",
@@ -14,15 +13,40 @@ export async function mealRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { sessionId } = request.cookies;
 
-      const meals = await knex("meals").where("session_id", sessionId).select()
-      const mappedMeals = meals.map((meal) =>({
+      const meals = await knex("meals").where("session_id", sessionId).select();
+      const mappedMeals = meals.map((meal) => ({
         ...meal,
-        is_on_diet: meal.is_on_diet ? 'Sim' : "Não",
-      }))
+        is_on_diet: meal.is_on_diet ? "Sim" : "Não",
+      }));
 
       return {
         meals: mappedMeals,
-      }
+      };
+    }
+  );
+
+  app.get(
+    "/:id",
+    {
+      preHandler: checkSessionIdExists,
+    },
+    async (request) => {
+      const getMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const { id } = getMealParamsSchema.parse(request.params);
+
+      const { sessionId } = request.cookies;
+
+      const meal = await knex("meals")
+        .where({
+          session_id: sessionId,
+          id,
+        })
+        .first();
+
+      return { meal };
     }
   );
 
@@ -38,7 +62,8 @@ export async function mealRoutes(app: FastifyInstance) {
       }, z.date()), // Aqui garantimos que será uma data válida
       is_on_diet: z.boolean(),
     });
-    const { name, description, date_time, is_on_diet } = createMealBodySchema.parse(request.body);
+    const { name, description, date_time, is_on_diet } =
+      createMealBodySchema.parse(request.body);
 
     let sessionId = request.cookies.sessionId;
 
