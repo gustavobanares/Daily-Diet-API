@@ -50,6 +50,25 @@ export async function mealRoutes(app: FastifyInstance) {
     }
   );
 
+  app.get(
+    "/metrics",
+    {
+      preHandler: checkSessionIdExists,
+    },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
+
+      const totalMeals = await knex("meals")
+        .where("session_id", sessionId)
+        .count({ count: '*'})
+        .first();
+
+      return reply.status(200).send({
+        totalMeals: totalMeals?.count || 0,
+      });
+    }
+  );
+
   app.post("/", async (request, reply) => {
     const createMealBodySchema = z.object({
       name: z.string(),
@@ -147,15 +166,15 @@ export async function mealRoutes(app: FastifyInstance) {
 
       const { sessionId } = request.cookies;
 
-      const meal = await knex('meals')
-      .where({id, session_id: sessionId})
-      .first()
+      const meal = await knex("meals")
+        .where({ id, session_id: sessionId })
+        .first();
 
-      await knex('meals')
-      .where({id, session_id: sessionId})
-      .delete()
+      await knex("meals").where({ id, session_id: sessionId }).delete();
 
-      return reply.status(200).send({message: 'Refeição excluída com sucesso!'})
+      return reply
+        .status(200)
+        .send({ message: "Refeição excluída com sucesso!" });
     }
   );
 }
