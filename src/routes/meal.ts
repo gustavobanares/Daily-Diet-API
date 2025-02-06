@@ -73,10 +73,29 @@ export async function mealRoutes(app: FastifyInstance) {
       .count({count: '*'})
       .first()
 
+      const allMeals = await knex('meals')
+      .where({session_id: sessionId})
+      .orderBy('date_time', 'asc')
+
+      let currentSequence = 0
+      let bestSequence = 0
+
+      allMeals.forEach((meal) =>{
+        if(meal.is_on_diet){
+          currentSequence++
+        if(currentSequence > bestSequence){
+          bestSequence= currentSequence
+        }  
+        } else{
+          currentSequence = 0
+        }
+      })
+
       return reply.status(200).send({
         totalMeals,
         totalMealsOnDiet,
-        totalMealsOffDiet
+        totalMealsOffDiet,
+        bestSequence,
       });
     }
   );
